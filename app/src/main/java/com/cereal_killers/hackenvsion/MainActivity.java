@@ -1,17 +1,73 @@
 package com.cereal_killers.hackenvsion;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import android.widget.Toolbar;
+
+import com.andtinder.model.CardModel;
+import com.andtinder.model.Orientations;
+import com.andtinder.view.CardContainer;
+import com.andtinder.view.SimpleCardStackAdapter;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
+
+    CardContainer mCardContainer;
+    Toolbar toolbar;
+    SimpleCardStackAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mCardContainer = (CardContainer) findViewById(R.id.layoutview);
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mCardContainer.setOrientation(Orientations.Orientation.Ordered);
+        mCardContainer.setOrientation(Orientations.Orientation.Disordered);
+
+
+        Resources r = getResources();
+        CardModel card = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture1));
+        CardModel card2 = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture2));
+        CardModel card3 = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture3));
+
+
+        card.setOnCardDimissedListener(new CardModel.OnCardDimissedListener() {
+            @Override
+            public void onLike() {
+                Toast.makeText(MainActivity.this, "I like it :)", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDislike() {
+
+//                Toast.makeText(MainActivity.this, "I don't like it :(", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+        card.setOnClickListener(new CardModel.OnClickListener() {
+            public void OnClickListener() {
+
+                Toast.makeText(MainActivity.this, "Click again", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        adapter = new SimpleCardStackAdapter(this);
+        adapter.add(card);
+        adapter.add(card2);
+        adapter.add(card3);
+        mCardContainer.setAdapter(adapter);
+
     }
 
     @Override
