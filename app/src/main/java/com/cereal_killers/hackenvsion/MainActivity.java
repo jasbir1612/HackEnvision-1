@@ -1,8 +1,13 @@
 package com.cereal_killers.hackenvsion;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,10 +22,17 @@ import com.andtinder.model.Orientations;
 import com.andtinder.view.CardContainer;
 import com.andtinder.view.SimpleCardStackAdapter;
 import com.gc.materialdesign.views.Button;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,11 +44,9 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
     Toolbar toolbar;
     SimpleCardStackAdapter adapter;
     ProgressDialog mProgressDialog;
-    String[] titles={"title1","title2","title3","title4"};
-    String[] description= {"description1","description2","description3","description4"};
-    String[] img;
-    Button like, dislike;
+    String[] titles, body, imageUrl;
     CardModel card;
+    public static final String link = "https://api.myjson.com/bins/47iub";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,62 +55,21 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
 
         mCardContainer = (CardContainer) findViewById(R.id.layoutview);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        like = (Button) findViewById(R.id.like);
-        dislike = (Button) findViewById(R.id.dislike);
         mCardContainer.setOrientation(Orientations.Orientation.Ordered);
         mCardContainer.setOrientation(Orientations.Orientation.Disordered);
 
         setSupportActionBar(toolbar);
         toolbar.setTitle("HackEnvision");
         toolbar.setTitleTextColor(Color.WHITE);
-
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onLike();
-            }
-        });
-        dislike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onDislike();
-            }
-        });
-
-        //picasso
-
-
-//        Picasso.with(this)
-//                .load("YOUR IMAGE URL HERE")
-//                .into(imageView);
-
-
-
-
-//        CardModel card = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture1));
-//        CardModel card2 = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture2));
-//        CardModel card3 = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture3));
-
-
         adapter = new SimpleCardStackAdapter(this);
-
-        for(int i=0;i<4;i++)
-        {
-            Resources r = getResources();
-            card = new CardModel(titles[i], description[i],r.getDrawable(R.drawable.picture1));
-            adapter.add(card);
-            card.setOnCardDimissedListener(this);
-            card.setOnClickListener(this);
-        }
-
-
-        mCardContainer.setAdapter(adapter);
 
         mProgressDialog = new ProgressDialog(MainActivity.this);
         mProgressDialog.setTitle("Downloading...");
         mProgressDialog.setMessage("Please wait.");
         mProgressDialog.setCancelable(false);
         mProgressDialog.setIndeterminate(true);
+
+        new AsyncHttpTask().execute(link);
 
     }
 
@@ -115,18 +84,15 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onLike() {
@@ -151,8 +117,9 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
 
         @Override
         protected Integer doInBackground(String... params) {
+
             InputStream inputStream = null;
-            Integer result = 0; //unsuccessfull initially
+            Integer result = 0;
             HttpURLConnection httpURLConnection = null;
             int statusCode;
 
@@ -169,26 +136,83 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
                     result = 1;
                 } else {
                     result = 0;
-                    //      Toaster.toast(MainActivity.this, "Check internet connection");//failed to fetch data
                 }
             } catch (MalformedURLException e) {
-                //    Toaster.toast(MainActivity.this, "Error in url");
+
             } catch (IOException e) {
-                //  Toaster.toast(MainActivity.this, "Error in opening connection");
             }
             return result;
         }
 
+        @Override
+        protected void onPostExecute(Integer result) {
+
+            if (result == 1) {
+
+                for(int i=titles.length-1; i>0 ;i--) {
+                    mProgressDialog.dismiss();
+                    Resources r = getResources();
+//                    Bitmap bitmap =  Picasso.with(MainActivity.this).load(imageUrl[i]).placeholder(R.drawable.icon);
+                    card = new CardModel(titles[i], body[i],r.getDrawable(R.drawable.picture1));
+                    card.setOnCardDimissedListener(MainActivity.this);
+                    card.setOnClickListener(MainActivity.this);
+                    adapter.add(card);
+                }
+
+            } else {
+                Toaster.toast(MainActivity.this, "downloading failed");
+            }
+            mCardContainer.setAdapter(adapter);
+        }
 
         @Override
         protected void onPreExecute() {
             mProgressDialog.show();
         }
     }
-    private void parseJson(String data) {
+
+    public String convertToString(InputStream is) {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        String line = "";
+        String result = "";
+        try {
+            while ((line = bufferedReader.readLine()) != null) {
+                result += line;
+            }
+        } catch (IOException e) {
+            Toaster.toast(MainActivity.this, "Error in converting to string");
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    Toaster.toast(MainActivity.this, "error in closing inputstream");
+                }
+            }
+        }
+        return result;
     }
 
-    private String convertToString(InputStream is) {
-        return null;
+    public void parseJson(String data) {
+
+        try {
+            JSONArray response = new JSONArray(data);
+
+            titles = new String[response.length()];
+            body = new String[response.length()];
+            imageUrl = new String[response.length()];
+
+
+            for(int i = 0; i < response.length(); i++)
+            {
+                JSONObject jsonObject = response.optJSONObject(i);
+                titles[i] = jsonObject.optString("title");
+                body[i] = jsonObject.optString("body");
+                imageUrl[i] = jsonObject.optString("image_url");
+            }
+
+        } catch (JSONException e) {
+            Toaster.toast(MainActivity.this, "Error in json parsing");
+        }
     }
 }

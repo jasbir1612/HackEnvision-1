@@ -61,7 +61,11 @@ public class Welcome extends FragmentActivity {
             @Override
             public void onPageSelected(int position) {
 
-                if(position==2)
+                if(position == 0 || position ==1)
+                {
+                    btnnext.setVisibility(View.GONE);
+                }
+                if(position == 2)
                 {
                     btnnext.setVisibility(View.VISIBLE);
                 }
