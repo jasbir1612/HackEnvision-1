@@ -3,19 +3,24 @@ package com.cereal_killers.hackenvsion;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.andtinder.model.CardModel;
 import com.andtinder.model.Orientations;
 import com.andtinder.view.CardContainer;
 import com.andtinder.view.SimpleCardStackAdapter;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,10 +35,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mCardContainer = (CardContainer) findViewById(R.id.layoutview);
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         mCardContainer.setOrientation(Orientations.Orientation.Ordered);
         mCardContainer.setOrientation(Orientations.Orientation.Disordered);
 
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("HackEnvision");
+        toolbar.setTitleTextColor(Color.WHITE);
 
         Resources r = getResources();
         CardModel card = new CardModel("Title1", "Description", r.getDrawable(R.drawable.picture1));
@@ -50,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDislike() {
 
-//                Toast.makeText(MainActivity.this, "I don't like it :(", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "I don't like it :(", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -67,6 +75,37 @@ public class MainActivity extends AppCompatActivity {
         adapter.add(card2);
         adapter.add(card3);
         mCardContainer.setAdapter(adapter);
+
+
+
+//        new MaterialShowcaseView.Builder(this)
+//                .setTarget(mCardContainer)
+//                .setDismissText("GOT IT")
+//                .setContentText("This is some amazing feature you should know about")
+//                .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
+//                .singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
+//                .show();
+//
+//        ShowcaseConfig config = new ShowcaseConfig();
+//        config.setDelay(500); // half second between each showcase view
+//
+//        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this);
+//
+//        sequence.setConfig(config);
+//
+//        sequence.addSequenceItem(mCardContainer,
+//                "This is button one", "GOT IT");
+
+//        sequence.addSequenceItem(mButtonTwo,
+//                "This is button two", "GOT IT");
+//
+//        sequence.addSequenceItem(mButtonThree,
+//                "This is button three", "GOT IT");
+//
+//        sequence.start();
+
+
+
 
     }
 
