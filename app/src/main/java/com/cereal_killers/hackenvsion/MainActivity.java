@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
     ProgressDialog mProgressDialog;
     String[] titles, body, imageUrl;
     CardModel card;
+    public static int position = 0;
     public static final String link = "https://api.myjson.com/bins/47iub";
 
     @Override
@@ -96,20 +97,20 @@ public class MainActivity extends AppCompatActivity implements CardModel.OnCardD
 
     @Override
     public void onLike() {
-
-        Toast.makeText(MainActivity.this, "I like it :)", Toast.LENGTH_SHORT).show();
-
+        position++;
     }
 
     @Override
     public void onDislike() {
-
-        Toast.makeText(MainActivity.this, "I don't like it :(", Toast.LENGTH_SHORT).show();
-
+        position++;
     }
 
     @Override
     public void OnClickListener() {
+
+//        Intent intent = new Intent(MainActivity.this, Body.class);
+//        intent.putExtra("body", body[position]);
+//        startActivity(intent);
 
     }
 
