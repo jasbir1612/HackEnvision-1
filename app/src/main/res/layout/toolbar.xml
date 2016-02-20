@@ -3,4 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
-    xmlns:android="http://schemas.android.com/apk/res/android"></android.support.v7.widget.Toolbar>
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Affairs"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:textColor="#FFFFFF"/>
+
+</android.support.v7.widget.Toolbar>
